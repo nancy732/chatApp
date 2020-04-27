@@ -3,8 +3,8 @@ import { StyleSheet, StatusBar, Text, View, Image, TextInput, ScrollView } from 
 import SafeAreaView, { SafeAreaProvider } from 'react-native-safe-area-view';
 import Images from '../assets/index'
 import Message from '../components/Message'
-import database from '@react-native-firebase/database';
-
+// import database from '@react-native-firebase/database';
+import { db } from '../Config/Config'
 const Chat = ({ route, navigation }) => {
     const [message, setText] = useState('')
     const [send, setSend] = useState(false)
@@ -13,7 +13,7 @@ const Chat = ({ route, navigation }) => {
     const [num, setNum] = useState()
 
     useEffect(() => {
-        database()
+        db
             .ref(`/${name}`)
             .once('value')
             .then(snapshot => {
@@ -24,24 +24,37 @@ const Chat = ({ route, navigation }) => {
                     setNum('1')
                 }
             });
-    }, [num])
-
+    }, [])
     useEffect(() => {
-        database()
+        db
             .ref(`/${name}`)
             .once('value')
             .then(snapshot => {
-                setMessages(snapshot.val())
+                if (snapshot.val() !== null) {
+                    snapshot.val().map(value => {
+                        if (value != null) {
+                            Messages.push(value)
+                            setSend(true)
+                        }
+                    })
+                }
             })
     }, [])
     const handleSubmit = e => {
-        database()
+        db
             .ref(`/${name}/${num}`)
             .set({
+                id: num,
                 message: message,
+                time: new Date().toLocaleTimeString()
             })
             .then(() => console.log('Data updated.'));
-        setSend(true)
+        Messages.push({
+            id: num,
+            message: message,
+            time: new Date().toLocaleTimeString()
+        })
+        setText('')
     }
     return (
         <>
@@ -53,21 +66,14 @@ const Chat = ({ route, navigation }) => {
                         <Text style={styles.contactName}>{name}</Text>
                     </View>
                     <ScrollView contentContainerStyle={styles.chatBody}>
-
-                        {Messages.map(value => {
-                            if (value != null) {
-                                <Message message={value.message} />
-                            }
-                        })}
-                        {send ?
-                            <Message message={message} />
-                            : <Text></Text>
-                        }
+                        <Message message={Messages} />
                     </ScrollView>
                     <View style={styles.input}>
                         <TextInput
                             placeholder="Enter Text"
                             name="chat"
+                            value={message}
+
                             onChangeText={text => {
                                 setSend(false)
                                 setText(text)
@@ -101,6 +107,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white'
     },
     header: {
+        zIndex: 20,
         position: 'absolute',
         top: 0,
         width: '100%',
@@ -109,8 +116,10 @@ const styles = StyleSheet.create({
         alignContent: 'center',
     },
     chatBody: {
-        paddingVertical: 100,
-        paddingHorizontal: 10
+        position: 'absolute',
+        top: 75,
+        bottom: 60,
+        paddingLeft: 200,
     },
     contactName: {
         color: 'white',
@@ -120,6 +129,7 @@ const styles = StyleSheet.create({
     input: {
         position: 'absolute',
         bottom: 0,
+        zIndex: 20,
         flexDirection: 'row',
         borderTopColor: 'gray',
         borderTopWidth: 1

@@ -1,5 +1,6 @@
 export default {
     search: require('./Images/search.png'),
     person: require('./Images/person-male.png'),
-    send: require('./Images/send.png')
+    send: require('./Images/send.png'),
+    tick: require('./Images/tick.png')
 };
