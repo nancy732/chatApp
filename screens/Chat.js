@@ -132,7 +132,8 @@ const styles = StyleSheet.create({
         zIndex: 20,
         flexDirection: 'row',
         borderTopColor: 'gray',
-        borderTopWidth: 1
+        borderTopWidth: 1,
+        paddingHorizontal: 10
     },
     send: {
         width: 30,
