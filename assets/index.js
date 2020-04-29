@@ -8,4 +8,7 @@ export default {
     background: require('./Images/background.jpg'),
     personLogin: require('./Images/person.png'),
     lock: require('./Images/lock.png'),
+    login: require('./Images/login.jpg'),
+    india: require('./Images/india.png'),
+    checked: require('./Images/checked.png')
 };
